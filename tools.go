@@ -48,6 +48,17 @@ type UploadedFile struct {
 	FileSize         int64
 }
 
+// UploadOneFile uploads a single file from a multipart form request to the given directory.
+func (t *Tools) UploadOneFile(r *http.Request, uploadDir string, rename ...bool) (*UploadedFile, error) {
+
+	files, err := t.UploadFiles(r, uploadDir, rename...)
+	if err != nil {
+		return nil, err
+	}
+
+	return files[0], nil
+}
+
 // UploadFiles uploads files from a multipart form request to the given directory.
 func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) ([]*UploadedFile, error) {
 	renameFile := true
@@ -76,7 +87,9 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 				if err != nil {
 					return nil, err
 				}
-				defer infile.Close()
+				defer func() {
+					_ = infile.Close()
+				}()
 
 				allowed, _ := t.getFileContentType(infile)
 
@@ -96,8 +109,13 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 					uploadedFile.NewFileName = hdr.Filename
 				}
 
+				uploadedFile.OriginalFileName = hdr.Filename
+
 				var outfile *os.File
-				defer outfile.Close()
+				defer func() {
+					_ = outfile.Close()
+				}()
+
 				if outfile, err = os.Create(filepath.Join(uploadDir, uploadedFile.NewFileName)); err != nil {
 					return nil, err
 				} else {
