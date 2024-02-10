@@ -100,3 +100,24 @@ func TestTools_UploadOneFile(t *testing.T) {
 		t.Errorf("UploadOneFile() set incorrect file size, got %d, want %d", uploadedFile.FileSize, len(fileContent))
 	}
 }
+
+func TestTools_CreateDirIfNotExist(t *testing.T) {
+	var (
+		testTools Tools
+	)
+
+	err := testTools.CreateDirIfNotExist("./test-dir")
+
+	if err != nil {
+		t.Errorf("CreateDirIfNotExist() returned an error: %v", err)
+	}
+
+	err = testTools.CreateDirIfNotExist("./test-dir")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Clean up
+	_ = os.Remove("./test-dir")
+}

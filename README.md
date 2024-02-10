@@ -59,6 +59,16 @@ type UploadedFile struct {
 }
 ```
 
+### CreateDirIfNotExist
+Use the `CreateDirIfNotExist` function to create a directory, and all necessary parents, if it does not exist.
+
+```go
+err := tools.CreateDirIfNotExist("/path/to/directory")
+if err != nil {
+    fmt.Println(err)
+}
+```
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
